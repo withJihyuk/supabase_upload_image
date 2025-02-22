@@ -2,13 +2,12 @@ import {
   Controller,
   Post,
   Req,
-  UploadedFile,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { multerR2Options } from './options/multerR2Options';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('image')
 export class ImageController {
