@@ -29,4 +29,4 @@ jobs:
           context: .
           push: true
           platforms: linux/arm64
-          tags: ghcr.io/withJihyuk/supabase_upload_image:latest
+          tags: ghcr.io/withjihyuk/supabase_upload_image:latest
