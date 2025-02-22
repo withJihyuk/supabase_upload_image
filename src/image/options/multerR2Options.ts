@@ -21,6 +21,6 @@ export const multerR2Options = {
     filedSize: 10 * 1024 * 1024,
     fields: 2,
     fileSize: 16777216,
-    files: 1,
+    files: 10,
   },
 };
