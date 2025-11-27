@@ -55,40 +55,10 @@ export class ImageService {
 
         try {
           await this.s3Service.getClient().send(command);
-
-          // supabaseInsertData.push({
-          //   user_id: userId,
-          //   id: fileId,
-          // });
         } catch (uploadError) {
           throw new HttpException('이미지 업로드에 실패했습니다.', 500);
         }
       }
-
-      // if (supabaseInsertData.length > 0) {
-      //   const { data, error } = await this.supabaseService
-      //     .getClient()
-      //     .from('image')
-      //     .insert(supabaseInsertData);
-
-      //   if (error) {
-      //     console.error('Supabase 삽입 오류:', error);
-
-      //     if (fileIds.length > 0) {
-      //       console.warn('일부 이미지만 저장되었습니다.');
-      //       return fileIds;
-      //     } else {
-      //       throw new HttpException(
-      //         '이미지 메타데이터 저장에 실패했습니다.',
-      //         500,
-      //       );
-      //     }
-      //   }
-
-      //   console.log('Supabase 삽입 성공:', data);
-      // } else {
-      //   console.warn('삽입할 데이터가 없습니다.');
-      // }
 
       return fileIds;
     } catch (error) {
