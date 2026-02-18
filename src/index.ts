@@ -58,7 +58,7 @@ app.post('/image', async (c) => {
       return c.json({ error: `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit` }, 400);
     }
 
-    const id = crypto.randomUUID();
+    const id = `${crypto.randomUUID()}.webp`;
     await c.env.R2_BUCKET.put(id, file, {
       httpMetadata: { contentType: 'image/webp' },
     });
