@@ -1,0 +1,7 @@
+name = "supabase-upload-image"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "diary-prod-01"
