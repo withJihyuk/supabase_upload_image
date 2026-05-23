@@ -53,17 +53,44 @@ curl -X POST http://localhost:8787/image \
 ```bash
 # 의존성 설치
 pnpm install
+```
 
-# wrangler.toml에서 bucket_name 설정 후
+로컬에서 실행하기 전에 `wrangler.toml`의 R2 버킷 이름과 Supabase 환경값을 준비한다.
+
+```bash
 pnpm dev
 ```
 
-## 환경 변수 (Secrets)
+## 필요한 값
+
+### R2 버킷
+
+`wrangler.toml`의 `bucket_name`은 실제 Cloudflare R2 버킷 이름과 같아야 한다.
+
+```toml
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "diary-prod-01"
+```
+
+코드에서는 `R2_BUCKET` 바인딩을 사용한다.
+
+### Supabase 환경 변수
+
+Cloudflare Worker에는 아래 secret을 등록해야 한다.
 
 ```bash
 wrangler secret put SUPABASE_URL
-wrangler secret put SUPABASE_KEY
+wrangler secret put SUPABASE_PUBLISHABLE_KEY
 ```
+
+| 이름 | 값 |
+|---|---|
+| `SUPABASE_URL` | Supabase 프로젝트 URL (`https://<project-ref>.supabase.co`) |
+| `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key (`sb_publishable_...`) |
+
+`SUPABASE_PUBLISHABLE_KEY`는 Supabase의 최신 publishable key 방식을 사용한다.
+기존 `SUPABASE_KEY` 환경 변수는 더 이상 사용하지 않는다.
 
 ## 배포
 
@@ -71,8 +98,15 @@ wrangler secret put SUPABASE_KEY
 pnpm deploy
 ```
 
-GitHub Actions로 `main` 브랜치 push 시 자동 배포된다. `CLOUDFLARE_API_TOKEN` secret 필요.
+CI에서 배포하려면 Cloudflare API 토큰을 CI secret으로 등록해야 한다.
+
+```text
+CLOUDFLARE_API_TOKEN
+```
+
+현재 저장소에는 GitHub Actions workflow가 포함되어 있지 않다.
 
 ## 참고
 
 - `wrangler.toml`의 `bucket_name`을 실제 R2 버킷명으로 변경할 것
+- Supabase Auth 토큰은 API 요청의 `Authorization: Bearer <supabase_access_token>` 헤더로 전달한다.

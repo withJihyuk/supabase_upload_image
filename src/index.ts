@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 type Bindings = {
   R2_BUCKET: R2Bucket;
   SUPABASE_URL: string;
-  SUPABASE_KEY: string;
+  SUPABASE_PUBLISHABLE_KEY: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -23,7 +23,10 @@ app.post("/image", async (c) => {
   }
 
   const token = authHeader.slice(7);
-  const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
+  const supabase = createClient(
+    c.env.SUPABASE_URL,
+    c.env.SUPABASE_PUBLISHABLE_KEY,
+  );
   const { error: authError } = await supabase.auth.getUser(token);
   if (authError) {
     return c.json({ error: "Unauthorized" }, 401);
