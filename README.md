@@ -1,6 +1,6 @@
 # supabase-upload-image
 
-Cloudflare Workers 기반 이미지 업로드 서버. Supabase Auth로 인증하고, WebP 이미지를 R2에 저장한다.
+Cloudflare Workers 기반 이미지 업로드 서버. Supabase Auth로 인증하고, WebP·JPEG·PNG 이미지를 R2에 저장한다.
 
 ## 스택
 
@@ -17,7 +17,7 @@ Cloudflare Workers 기반 이미지 업로드 서버. Supabase Auth로 인증하
 
 ### `POST /image`
 
-다중 이미지 업로드. WebP 이미지를 R2에 저장.
+다중 이미지 업로드. WebP·JPEG·PNG 이미지를 R2에 저장.
 
 **Headers**
 
@@ -30,9 +30,10 @@ Cloudflare Workers 기반 이미지 업로드 서버. Supabase Auth로 인증하
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
-| files | File[] | WebP 이미지 파일 (최대 10개, 개당 16MB) |
+| files | File[] | WebP·JPEG·PNG 파일 (최대 10개, 개당 16MB) |
+| imageIds | string (선택) | files 순서에 맞춘 고유 UUID 배열의 JSON 문자열 |
 
-- 허용 타입: `webp`
+- 허용 타입: `image/webp`, `image/jpeg`, `image/png`. MIME과 파일 시그니처를 함께 검사한다.
 - 응답: UUID 배열 (`string[]`)
 
 **예시**
@@ -47,6 +48,14 @@ curl -X POST http://localhost:8787/image \
 ```json
 ["550e8400-e29b-41d4-a716-446655440000", "6ba7b810-9dad-11d1-80b4-00c04fd430c8"]
 ```
+
+`imageIds`를 보내면 같은 사용자·ID·파일 내용의 재요청은 같은 결과를 반환한다. ID는 소문자로 정규화한다. 다른 사용자나 다른 내용의 덮어쓰기는 409로 거절한다. 필드를 생략한 기존 요청도 계속 지원한다.
+
+전체 파일 검증 후 R2에 저장한다. 저장 도중 네트워크 오류가 나면 같은 ID와 파일 바이트로 재시도한다. R2 조건부 쓰기와 owner/SHA-256 메타데이터로 동시 재시도도 보호한다. 파일을 다시 압축하거나 ID를 새로 만들지 않는다.
+
+객체 경로와 CDN 주소는 그대로 유지한다. 기존 객체에 소유자 정보를 추측해서 붙이거나 파일을 자동 삭제하지 않는다.
+
+검증: `pnpm exec tsc --noEmit`, `pnpm exec wrangler deploy --dry-run`. 로컬 Worker/R2와 가짜 인증 응답으로 재시도·동시 생성·소유자 및 내용 충돌·MIME 오류·파일 전체 사전 검증·기존 요청 호환성을 확인했다. 2026-09-05 운영 Worker에 배포했다. 배포 버전은 `4c5fe19b-d1dd-4493-b9d4-b792c6a598b2`이며 기존 변수·시크릿을 유지했다.
 
 ## 로컬 개발
 
