@@ -59,10 +59,14 @@ curl -X POST http://localhost:8787/image \
 
 ## 로컬 개발
 
+Node.js 22 이상과 pnpm 10.4.1을 사용한다.
+
 ```bash
 # 의존성 설치
 pnpm install
 ```
+
+2026-10-26 보안 업데이트: Hono 4.13.14, Supabase JS 2.118.0, Wrangler 4.152.0으로 올렸다. Wrangler의 Miniflare가 사용하는 Undici 7.29.1에는 최근 보안 공지가 있어 `pnpm.overrides`로 7.30.1 이상 패치를 적용한다. Wrangler가 패치된 Undici를 기본으로 사용하면 override 제거를 검토한다.
 
 로컬에서 실행하기 전에 `wrangler.toml`의 R2 버킷 이름과 Supabase 환경값을 준비한다.
 
